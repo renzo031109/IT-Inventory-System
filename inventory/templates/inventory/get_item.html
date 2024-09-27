@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}
+RELEASED ITEM FORM
+{% endblock title %}
+
+
+{% block content %}
+
+<div class="card card-body mt-5 mb-5 pb-4 shadow fade show">
+
+  <div class="container mt-3">
+
+    <form class="form-horizontal" method="POST" action="">
+    {% csrf_token %}
+    {{ formset.management_form }}
+
+      <div class="row">
+
+        <div class="get-item-title mb-5"><center><h3>RELEASED ITEM FORM</h3></center></div>
+   
+        {% for identity in formset %}
+        <div class="col">
+          {{ identity.firstName.label_tag }}
+          {{ identity.firstName }}
+        </div>
+        <div class="col">
+          {{ identity.middleName.label_tag }}
+          {{ identity.middleName }}
+        </div>  
+        <div class="col">
+          {{ identity.lastName.label_tag }}
+          {{ identity.lastName }}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <p></p>
+          {{ identity.client_name.label_tag }}
+          {{ identity.client_name }}
+        </div>
+        <div class="col">
+          <p></p>
+          {{ identity.department_name.label_tag }}
+          {{ identity.department_name }}
+        </div>
+      </div>
+        {% endfor %}
+      
+      <div class="row">
+          <table class="table table-bordered table-hover mt-4">
+              <thead>
+
+                <tr>
+            
+                    <th scope="col" style="width:70%">Item Name</th>
+                    <th scope="col" style="width:30%">Quantity</th>
+                    <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody class="form-row spacer">
+                  {% for form in formset %}
+                  <tr> 
+                  
+                    <td>{{ form.item_code}}</td>
+                    <td>{{ form.quantity }}</td>
+                    
+                    <td><center><button type="button" class="btn btn-success add-form-row">+</button></center></td>
+                    
+                  </tr>
+                  
+                  {% endfor %}
+                  
+              </tbody>
+          </table>
+      </div>    
+          
+
+      <button type="submit" class="btn btn-dark" id="submitbtnget">
+        <span class="spinner-border spinner-border-sm" id="spinner" role="status" aria-hidden="true"></span> 
+        SUBMIT
+      </button>
+
+    </form>
+  </div>
+</div>
+
+<!-- Call the script for the formset -->
+{% include 'inventory/form_script.html' %}
+
+{% endblock %}
+
+
