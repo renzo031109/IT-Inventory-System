@@ -8,7 +8,7 @@ RELEASED ITEM FORM
 
 
 {% block content %}
-
+<div class="container">
 <div class="card card-body mt-5 mb-5 pb-4 shadow fade show">
 
   <div class="container mt-3">
@@ -23,16 +23,8 @@ RELEASED ITEM FORM
    
         {% for identity in formset %}
         <div class="col">
-          {{ identity.firstName.label_tag }}
-          {{ identity.firstName }}
-        </div>
-        <div class="col">
-          {{ identity.middleName.label_tag }}
-          {{ identity.middleName }}
-        </div>  
-        <div class="col">
-          {{ identity.lastName.label_tag }}
-          {{ identity.lastName }}
+          {{ identity.member.label_tag }}
+          {{ identity.member}}
         </div>
       </div>
 
@@ -87,7 +79,7 @@ RELEASED ITEM FORM
     </form>
   </div>
 </div>
-
+</div>
 <!-- Call the script for the formset -->
 {% include 'inventory/form_script.html' %}
 

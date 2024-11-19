@@ -42,19 +42,22 @@ class ItemNewForm(forms.ModelForm):
 ItemModelFormSet = modelformset_factory(
     Item, 
     fields=('item_code',
-            'quantity','item_name',
+            'quantity',
+            'item_name',
             'brand_name',
             'client_name',
             'department_name',
-            'firstName',
-            'lastName',
-            'middleName'
+            'member'
+            # 'firstName',
+            # 'lastName',
+            # 'middleName'
             ),
     extra=1,
     labels={
-        'firstName':'FIRST NAME',
-        'middleName': 'MIDDLE NAME',
-        'lastName': 'LAST NAME',
+        # 'firstName':'FIRST NAME',
+        # 'middleName': 'MIDDLE NAME',
+        # 'lastName': 'LAST NAME',
+        'member': 'STAFF NAME',
         'client_name': 'CLIENT NAME',
         'dapartment_name': 'DEPARTMENT NAME'
     },
@@ -82,18 +85,21 @@ ItemModelFormSet = modelformset_factory(
             'class':'form-control',
             'type':'hidden'
             }),
-        'firstName': forms.TextInput(attrs={
-            'class':'form-control',
-            }),
-        'middleName': forms.TextInput(attrs={
-            'class':'form-control', 
-            }),
-        'lastName': forms.TextInput(attrs={
-            'class':'form-control', 
-            }),
+        # 'firstName': forms.TextInput(attrs={
+        #     'class':'form-control',
+        #     }),
+        # 'middleName': forms.TextInput(attrs={
+        #     'class':'form-control', 
+        #     }),
+        # 'lastName': forms.TextInput(attrs={
+        #     'class':'form-control', 
+        #     }),
         'staff_name': forms.TextInput(attrs={
             'class':'form-control',
             'type':'hidden'
+            }),
+        'member': forms.Select(attrs={
+            'class':'form-control',
             }),
         'client_name': forms.Select(attrs={
             'class':'form-control',

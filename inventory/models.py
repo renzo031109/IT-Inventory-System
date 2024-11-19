@@ -93,6 +93,22 @@ class ItemBase(models.Model):
     #     return self.soh * self.price
     
 
+class TeamMember(models.Model):
+    member = models.CharField(max_length=200)
+
+    class Meta:
+        ordering = ["member"]
+        verbose_name_plural = "Staff Name"
+
+    def __str__(self):
+        return self.member
+
+    #save input to uppercase
+    def save(self):
+        self.member = self.member.upper()
+        super(TeamMember, self).save()
+
+
 
 class Item(models.Model):
     item_code = models.ForeignKey(ItemCode, on_delete=models.CASCADE, null=True)
@@ -108,10 +124,11 @@ class Item(models.Model):
     # price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     # item_value = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
-    firstName = models.CharField(max_length=100, null=True, blank=True)
-    lastName = models.CharField(max_length=100, null=True, blank=True)
-    middleName = models.CharField(max_length=100, null=True, blank=True)
+    # firstName = models.CharField(max_length=100, null=True, blank=True)
+    # lastName = models.CharField(max_length=100, null=True, blank=True)
+    # middleName = models.CharField(max_length=100, null=True, blank=True)
 
+    member = models.ForeignKey(TeamMember, on_delete=models.CASCADE, null=True, blank=True)
     
     class Meta:
         ordering = ["-date_added"]
@@ -129,9 +146,9 @@ class Item(models.Model):
     # def totalAmt(self):
     #     return self.quantity * self.price
     
-    @property
-    def fullname(self):
-        return f"{self.lastName}, {self.firstName} {self.middleName}"
+    # @property
+    # def fullname(self):
+    #     return f"{self.lastName}, {self.firstName} {self.middleName}"
     
 
 

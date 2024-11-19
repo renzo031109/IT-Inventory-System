@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Item, ItemBase, ItemCode, UOM, Client, Department
+from .models import Item, ItemBase, ItemCode, UOM, Client, Department, TeamMember
 from .forms import ItemNewForm, ItemModelFormSet, ItemModelFormSetAdd
 from .filters import ItemFilter, ItemBaseFilter
 from django.http import HttpResponse
@@ -129,7 +129,7 @@ def delete_item(request, id):
 
                 print("negative")
 
-            # item_soh.soh = updated_soh
+            item_soh.soh = updated_soh
             # item_soh.total_price = updated_total_price
             # item_soh.total_value = item_val
 
@@ -197,7 +197,12 @@ def new_item(request):
             itemNewForm = form.save(commit=False)
 
             #define user for the staffname
-            user = request.user
+            try:
+                user = request.user
+                member = TeamMember.objects.get(member=user)
+            except:
+                member = TeamMember.objects.get(member="ADMIN")
+
             client = Client.objects.get(client=user_client)
             department=Department.objects.get(department=user_department)
 
@@ -210,7 +215,7 @@ def new_item(request):
                                     remarks="BEGINNING",
                                     uom=uom_value, 
                                     # price=form_item_price,
-                                    staff_name=user.username,
+                                    member=member,
                                     client_name=client,
                                     department_name=department
                                     )
@@ -304,8 +309,14 @@ def add_item(request):
                     # itemAddForm.item_value = added_item_amount
 
                     #get the current user
-                    user = request.user
-                    itemAddForm.staff_name = user.username
+                    try:
+                        user = request.user
+                        member = TeamMember.objects.get(member=user)
+                        itemAddForm.member = member
+                    except:
+                        member = TeamMember.objects.get(member="ADMIN")
+                        itemAddForm.member = member
+
                     itemAddForm.client_name = client
                     itemAddForm.department_name = department
   
@@ -333,7 +344,8 @@ def add_item(request):
 def get_item(request):
 
     #Initiate a list variable for the input select fields
-    staff_name_list = []
+    member_name_list = []
+    # staff_name_list = []
     client_name_list = []
     department_name_list = []
 
@@ -359,23 +371,26 @@ def get_item(request):
                     item_soh = ItemBase.objects.get(item_code=get_item_code)
 
 
-                    # get the staff name values
-                    get_firstName = form.cleaned_data.get('firstName')
-                    get_middleName = form.cleaned_data.get('middleName')
-                    get_lastName = form.cleaned_data.get('lastName')
+                    # # get the staff name values
+                    # get_firstName = form.cleaned_data.get('firstName')
+                    # get_middleName = form.cleaned_data.get('middleName')
+                    # get_lastName = form.cleaned_data.get('lastName')
 
                     # formatting of Full Name
-                    get_staff_name = f"{get_firstName} {get_middleName} {get_lastName}"
+                    get_member_name = form.cleaned_data.get('member')
+                    # get_staff_name = f"{get_firstName} {get_middleName} {get_lastName}"
                     get_client_name = form.cleaned_data.get('client_name')
                     get_department_name = form.cleaned_data.get('department_name')
 
-                    #populate the list from the user input
-                    staff_name_list.append(get_staff_name)
+                    # #populate the list from the user input
+                    # staff_name_list.append(get_staff_name)
+                    member_name_list.append(get_member_name)
                     client_name_list.append(get_client_name)
                     department_name_list.append(get_department_name)
                     
                     #get the first value of the form
-                    staff_name = staff_name_list[0]
+                    # staff_name = staff_name_list[0]
+                    member_name = member_name_list[0]
                     client_name = client_name_list[0]
                     department_name = department_name_list[0]
 
@@ -407,7 +422,7 @@ def get_item(request):
                         # itemGetForm.price = item_soh.price
                         itemGetForm.quantity = qtyToNegative
                         itemGetForm.uom = item_soh.uom
-                        itemGetForm.staff_name = staff_name
+                        itemGetForm.member = member_name
                         itemGetForm.client_name = client_name
                         itemGetForm.department_name = department_name
                         # itemGetForm.item_value = total
@@ -507,6 +522,7 @@ def export_excel_inventory(request):
     for item in items:
         
         #convert object fields to string
+        member = str(item.member)
         client_name = str(item.client_name)
         department_name = str(item.department_name)
         date_added = datetime.strftime(item.date_added,'%m/%d/%Y %H:%M:%S')
@@ -519,7 +535,8 @@ def export_excel_inventory(request):
             item.uom,
             date_added,
             item.remarks,
-            item.staff_name,
+            # item.staff_name,
+            member,
             client_name,
             department_name
         ])
