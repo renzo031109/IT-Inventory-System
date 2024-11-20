@@ -29,22 +29,7 @@ class Department(models.Model):
     def save(self):
         self.department = self.department.upper()
         super(Department, self).save()
-
-
-class ItemCode(models.Model):
-    code = models.CharField(max_length=200, null=True)
-
-    def __str__(self):
-        return self.code
-
-    class Meta:
-        ordering = ["code"]
-    
-    #Save data to upper case
-    def save(self):
-        self.code = self.code.upper()
-        super(ItemCode, self).save()
-    
+ 
 
 class UOM(models.Model):
     uom = models.CharField(max_length=30)
@@ -59,6 +44,56 @@ class UOM(models.Model):
     def save(self):
         self.uom= self.uom.upper()
         super(UOM, self).save()
+
+
+
+class Site(models.Model):
+    site = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.site
+
+    class Meta:
+        ordering = ["site"]
+    
+    #Save data to upper case
+    def save(self):
+        self.site = self.site.upper()
+        super(Site, self).save()
+
+
+class Floor(models.Model):
+    floor = models.CharField(max_length=200)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.floor
+
+    class Meta:
+        ordering = ["floor"]
+    
+    #Save data to upper case
+    def save(self):
+        self.floor = self.floor.upper()
+        super(Floor, self).save()
+
+
+
+class ItemCode(models.Model):
+    code = models.CharField(max_length=200, null=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True) 
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True) 
+
+    def __str__(self):
+        return self.code
+
+    class Meta:
+        ordering = ["code"]
+    
+    #Save data to upper case
+    def save(self):
+        self.code = self.code.upper()
+        super(ItemCode, self).save()
 
 
 class ItemBase(models.Model):
@@ -129,6 +164,8 @@ class Item(models.Model):
     # middleName = models.CharField(max_length=100, null=True, blank=True)
 
     member = models.ForeignKey(TeamMember, on_delete=models.CASCADE, null=True, blank=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True) 
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True, blank=True) 
     
     class Meta:
         ordering = ["-date_added"]

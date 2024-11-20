@@ -47,7 +47,9 @@ ItemModelFormSet = modelformset_factory(
             'brand_name',
             'client_name',
             'department_name',
-            'member'
+            'member',
+            'site',
+            'floor'
             # 'firstName',
             # 'lastName',
             # 'middleName'
@@ -59,7 +61,9 @@ ItemModelFormSet = modelformset_factory(
         # 'lastName': 'LAST NAME',
         'member': 'STAFF NAME',
         'client_name': 'CLIENT NAME',
-        'dapartment_name': 'DEPARTMENT NAME'
+        'dapartment_name': 'DEPARTMENT NAME',
+        'site': 'SITE',
+        'floor': 'FLOOR'
     },
     widgets={
         'item_code': forms.Select(attrs={
@@ -85,27 +89,29 @@ ItemModelFormSet = modelformset_factory(
             'class':'form-control',
             'type':'hidden'
             }),
-        # 'firstName': forms.TextInput(attrs={
-        #     'class':'form-control',
-        #     }),
-        # 'middleName': forms.TextInput(attrs={
-        #     'class':'form-control', 
-        #     }),
-        # 'lastName': forms.TextInput(attrs={
-        #     'class':'form-control', 
-        #     }),
         'staff_name': forms.TextInput(attrs={
             'class':'form-control',
             'type':'hidden'
             }),
         'member': forms.Select(attrs={
             'class':'form-control',
+            'required':True
             }),
         'client_name': forms.Select(attrs={
             'class':'form-control',
+            'required':True
             }),
         'department_name': forms.Select(attrs={
             'class':'form-control',    
+            'required':True
+            }),
+        'site': forms.Select(attrs={
+            'class':'form-control', 
+            'required':True
+            }),
+        'floor': forms.Select(attrs={
+            'class':'form-control', 
+            'required':True
             }),
 
     }

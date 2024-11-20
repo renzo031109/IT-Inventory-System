@@ -17,37 +17,56 @@ RELEASED ITEM FORM
     {% csrf_token %}
     {{ formset.management_form }}
 
-      <div class="row">
+    <div class="get-item-title mb-5"><center><h3>RELEASED ITEM FORM</h3></center></div>
 
-        <div class="get-item-title mb-5"><center><h3>RELEASED ITEM FORM</h3></center></div>
-   
-        {% for identity in formset %}
-        <div class="col">
-          {{ identity.member.label_tag }}
-          {{ identity.member}}
+    {% for identity in formset %}
+      
+      <div class="border px-3 pb-3 pt-2">
+        <div class=""><p><strong>FROM STORAGE LOCATION:</strong></p></div>
+        <div class="row mb-2">       
+          <div class="col">
+            {{ identity.site.label_tag }}
+            {{ identity.site}}
+          </div>
+          <div class="col">
+            {{ identity.floor.label_tag }}
+            {{ identity.floor }}
+          </div>
         </div>
       </div>
 
-      <div class="row">
-        <div class="col">
-          <p></p>
-          {{ identity.client_name.label_tag }}
-          {{ identity.client_name }}
-        </div>
-        <div class="col">
-          <p></p>
-          {{ identity.department_name.label_tag }}
-          {{ identity.department_name }}
+      <div class="border px-3 pb-3 pt-2 mt-3">
+        <div class=""><p><strong>PREPARED BY:</strong></p></div>
+        <div class="row">
+          <div class="col">
+            {{ identity.member.label_tag }}
+            {{ identity.member }}
+          </div>
         </div>
       </div>
-        {% endfor %}
+
+      <div class="border px-3 pb-3 pt-2 mt-3">
+        <div class=""><p><strong>RELEASE TO:</strong></p></div>
+        <div class="row">
+          <div class="col">
+            <p></p>
+            {{ identity.client_name.label_tag }}
+            {{ identity.client_name }}
+          </div>
+          <div class="col">
+            <p></p>
+            {{ identity.department_name.label_tag }}
+            {{ identity.department_name }}
+          </div>
+        </div>
+      </div>
+
+    {% endfor %}
       
       <div class="row">
           <table class="table table-bordered table-hover mt-4">
               <thead>
-
-                <tr>
-            
+                <tr>          
                     <th scope="col" style="width:70%">Item Name</th>
                     <th scope="col" style="width:30%">Quantity</th>
                     <th scope="col"></th>
@@ -80,6 +99,9 @@ RELEASED ITEM FORM
   </div>
 </div>
 </div>
+<!-- Call the script for the formset -->
+{% include 'inventory/form_script.html' %}
+
 <!-- Call the script for the formset -->
 {% include 'inventory/form_script.html' %}
 
