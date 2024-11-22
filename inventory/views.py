@@ -625,4 +625,11 @@ def export_excel_summary(request):
     return response
 
 
+#This is connected to itemcode ajax value
+def get_floors_and_items(request, site_id):
+    floors = list(Floor.objects.filter(site_id=site_id).values('id', 'floor'))
+    items = list(ItemCode.objects.filter(site_id=site_id).values('id', 'code'))
+    return JsonResponse({'floors': floors, 'items': items})
+
+
 
