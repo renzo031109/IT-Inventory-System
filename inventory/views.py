@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Item, ItemBase, ItemCode, UOM, Client, Department, TeamMember
+from .models import Item, ItemBase, ItemCode, UOM, Client, Department, TeamMember, Floor, Site
 from .forms import ItemNewForm, ItemModelFormSet, ItemModelFormSetAdd
 from .filters import ItemFilter, ItemBaseFilter
 from django.http import HttpResponse
@@ -16,10 +16,14 @@ from openpyxl import Workbook
 from datetime import datetime
 from openpyxl.styles import *
 
+from django.http import JsonResponse
+import json
 
-#set universal variable for user settings.
-user_department = "FINANCE"
-user_client = "SHORE360"
+
+
+# #set universal variable for user settings.
+# user_department = "FINANCE"
+# user_client = "SHORE360"
 
 
 
@@ -168,10 +172,14 @@ def new_item(request):
 
         if form.is_valid():
             #get the value of the form
+            form_item_site = request.POST.get('site')
+            form_item_floor = request.POST.get('floor')
             form_item_name = request.POST.get('item_name')
             form_item_brand = request.POST.get('brand_name')
             form_item_soh = request.POST.get('soh')
             form_item_uom = request.POST.get('uom')
+            form_item_client = request.POST.get('client_name')
+            form_item_department = request.POST.get('department_name')
             # form_item_price = request.POST.get('price')
 
             #convert UOM id to values of foreign key
@@ -203,8 +211,9 @@ def new_item(request):
             except:
                 member = TeamMember.objects.get(member="ADMIN")
 
-            client = Client.objects.get(client=user_client)
-            department=Department.objects.get(department=user_department)
+            # client = Client.objects.get(client=user_client)
+            # department=Department.objects.get(department=user_department)
+            # site=Site.objects.get(site=form_item_site)
 
             #copy newitem to Item Transaction
             itemTransaction = Item(
@@ -216,8 +225,10 @@ def new_item(request):
                                     uom=uom_value, 
                                     # price=form_item_price,
                                     member=member,
-                                    client_name=client,
-                                    department_name=department
+                                    client_name=form_item_client,
+                                    department_name=form_item_department,
+                                    site=form_item_site,
+                                    floor=form_item_floor
                                     )
             
 
@@ -348,6 +359,8 @@ def get_item(request):
     # staff_name_list = []
     client_name_list = []
     department_name_list = []
+    site_name_list = []
+    floor_name_list = []
 
     #list for validation checking
     item_error_list = []
@@ -378,6 +391,8 @@ def get_item(request):
 
                     # formatting of Full Name
                     get_member_name = form.cleaned_data.get('member')
+                    get_site_name = form.cleaned_data.get('site')
+                    get_floor_name = form.cleaned_data.get('floor')
                     # get_staff_name = f"{get_firstName} {get_middleName} {get_lastName}"
                     get_client_name = form.cleaned_data.get('client_name')
                     get_department_name = form.cleaned_data.get('department_name')
@@ -387,12 +402,16 @@ def get_item(request):
                     member_name_list.append(get_member_name)
                     client_name_list.append(get_client_name)
                     department_name_list.append(get_department_name)
+                    site_name_list.append(get_site_name)
+                    floor_name_list.append(get_floor_name)
                     
                     #get the first value of the form
                     # staff_name = staff_name_list[0]
                     member_name = member_name_list[0]
                     client_name = client_name_list[0]
                     department_name = department_name_list[0]
+                    site_name = site_name_list[0]
+                    floor_name = floor_name_list[0]
 
                     if item_soh.soh < get_qty:
                         messages.error(request, f"Ooops, Your available stock for '{item_soh.item_name}' is only '{item_soh.soh}")
@@ -425,6 +444,9 @@ def get_item(request):
                         itemGetForm.member = member_name
                         itemGetForm.client_name = client_name
                         itemGetForm.department_name = department_name
+                        itemGetForm.site = site_name
+                        itemGetForm.floor = floor_name
+
                         # itemGetForm.item_value = total
                         itemGetForm.save()
                 else:

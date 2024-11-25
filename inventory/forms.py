@@ -1,25 +1,27 @@
 from django import forms
 from django.forms import modelformset_factory, BaseFormSet
-from .models import Item, ItemBase
+from .models import Item, ItemBase, Floor, ItemCode
 
         
 class ItemNewForm(forms.ModelForm):
     class Meta:
         model = ItemBase
-        fields = [
+        fields = [ 
+            'site',
+            'floor',
             'item_name',
             'brand_name',
             'soh','uom',
-            # 'price',
             'item_code',
             'remarks',
             'critical_value'
             ]
         labels = {
+            'site': 'SITE',
+            'floor': 'FLOOR',
             'item_name': 'ITEM NAME',
             'brand_name': 'BRAND NAME (NONE if N/A)',
             'soh': 'BEGINNING BALANCE',
-            # 'price': 'PRICE',
             'item_code': 'ITEM CODE',
             'uom':'UOM',
             'remarks' : 'REMARKS',
@@ -27,11 +29,12 @@ class ItemNewForm(forms.ModelForm):
 
         }
         widgets = {
+            'site': forms.Select(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
+            'floor': forms.Select(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
             'item_name': forms.TextInput(attrs={'class':'ItemNewForm','autocomplete': 'off'}),
             'brand_name': forms.TextInput(attrs={'class':'ItemNewForm', 'value':'NONE', 'autocomplete': 'off'}),
             'soh': forms.TextInput(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
             'uom': forms.Select(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
-            # 'price': forms.TextInput(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
             'item_code': forms.TextInput(attrs={'class':'ItemNewForm','autocomplete': 'off','type':'hidden'}),
             'remarks': forms.TextInput(attrs={'value': 'OUT', 'type':'hidden'}),
             'critical_value': forms.TextInput(attrs={'class':'ItemNewForm', 'autocomplete': 'off'})

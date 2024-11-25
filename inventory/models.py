@@ -108,6 +108,10 @@ class ItemBase(models.Model):
     remarks = models.CharField(max_length=50, null=True)
     uom = models.ForeignKey(UOM, on_delete=models.CASCADE, null=True)
     critical_value = models.IntegerField(null=True, blank=True)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True) 
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True, blank=True) 
+    client_name = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True) 
+    department_name = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True) 
 
     class Meta:
         ordering = ["item_name"]
