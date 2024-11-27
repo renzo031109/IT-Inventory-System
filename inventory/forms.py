@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import modelformset_factory, BaseFormSet
-from .models import Item, ItemBase, Floor, ItemCode
+from .models import Item, ItemBase, ItemCode
 
         
 class ItemNewForm(forms.ModelForm):
@@ -8,7 +8,6 @@ class ItemNewForm(forms.ModelForm):
         model = ItemBase
         fields = [ 
             'site',
-            'floor',
             'item_name',
             'brand_name',
             'soh','uom',
@@ -18,7 +17,6 @@ class ItemNewForm(forms.ModelForm):
             ]
         labels = {
             'site': 'SITE',
-            'floor': 'FLOOR',
             'item_name': 'ITEM NAME',
             'brand_name': 'BRAND NAME (NONE if N/A)',
             'soh': 'BEGINNING BALANCE',
@@ -30,7 +28,6 @@ class ItemNewForm(forms.ModelForm):
         }
         widgets = {
             'site': forms.Select(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
-            'floor': forms.Select(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
             'item_name': forms.TextInput(attrs={'class':'ItemNewForm','autocomplete': 'off'}),
             'brand_name': forms.TextInput(attrs={'class':'ItemNewForm', 'value':'NONE', 'autocomplete': 'off'}),
             'soh': forms.TextInput(attrs={'class':'ItemNewForm', 'autocomplete': 'off'}),
@@ -41,10 +38,13 @@ class ItemNewForm(forms.ModelForm):
         }
 
 
+
+
 #Formset for Get Item
 class ItemGetForm(forms.ModelForm):
     class Meta:
-        Item, 
+        model = Item
+
         fields= ['item_code',
                 'quantity',
                 'item_name',
@@ -53,7 +53,7 @@ class ItemGetForm(forms.ModelForm):
                 'department_name',
                 'member',
                 'site',
-                'floor'
+                'remarks'
                 # 'firstName',
                 # 'lastName',
                 # 'middleName'
@@ -67,7 +67,8 @@ class ItemGetForm(forms.ModelForm):
             'client_name': 'CLIENT NAME',
             'dapartment_name': 'DEPARTMENT NAME',
             'site': 'SITE',
-            'floor': 'FLOOR'
+            'floor': 'FLOOR',
+            'remarks': 'PURPOSE'
         }
 
         widgets={
@@ -81,10 +82,6 @@ class ItemGetForm(forms.ModelForm):
                 'placeholder': '0',
                 'autocomplete': 'off',
                 'required':True
-                }),
-            'remarks': forms.TextInput(attrs={
-                'class':'form-control',
-                'type':'hidden'
                 }),
             'item_name': forms.TextInput(attrs={
                 'class':'form-control',
@@ -108,14 +105,15 @@ class ItemGetForm(forms.ModelForm):
                 }),
             'department_name': forms.Select(attrs={
                 'class':'form-control',    
-                'required':True
                 }),
             'site': forms.Select(attrs={
                 'class':'form-control', 
                 'required':True
                 }),
-            'floor': forms.Select(attrs={
-                'class':'form-control', 
+            'remarks': forms.TextInput(attrs={
+                'class':'form-control',
+                'placeholder': '-',
+                'autocomplete': 'off',
                 'required':True
                 }),
 
@@ -123,7 +121,6 @@ class ItemGetForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['floor'].queryset = Floor.objects.none()
         self.fields['item_code'].queryset = ItemCode.objects.none()
 
         print("this site", self.data)
@@ -131,12 +128,10 @@ class ItemGetForm(forms.ModelForm):
         if 'form-0-site' in self.data:
             try:
                 site_id = int(self.data.get('form-0-site'))
-                self.fields['floor'].queryset = Floor.objects.filter(site_id=site_id).order_by('floor')
                 self.fields['item_code'].queryset = ItemCode.objects.filter(site_id=site_id).order_by('code')
             except (ValueError, TypeError):
                 pass # invalid input from the client; ignore and fallback to empty City queryset
         elif self.instance.pk:
-            self.fields['floor'].queryset = self.instance.site.floor_set.order_by('floor')
             self.fields['item_code'].queryset = self.instance.site.itemcode_set.order_by('code')
             
 

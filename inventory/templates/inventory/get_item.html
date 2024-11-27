@@ -9,100 +9,106 @@ RELEASED ITEM FORM
 
 {% block content %}
 <div class="container">
-<div class="card card-body mt-5 mb-5 pb-4 shadow fade show">
+  <div class="card card-body mt-5 mb-5 pb-4 shadow fade show">
 
-  <div class="container mt-3">
+    <div class="container mt-3">
 
-    <form class="form-horizontal" method="POST" action="">
-    {% csrf_token %}
-    {{ formset.management_form }}
+      <form class="form-horizontal" method="POST" action="">
+      {% csrf_token %}
+      {{ formset.management_form }}
 
-    <div class="get-item-title mb-5"><center><h3>RELEASED ITEM FORM</h3></center></div>
+      <div class="get-item-title mb-5"><center><h3>RELEASED ITEM FORM</h3></center></div>
 
-    {% for identity in formset %}
-      
-      <div class="border px-3 pb-3 pt-2">
-        <div class=""><p><strong>FROM STORAGE LOCATION:</strong></p></div>
-        <div class="row mb-2">       
-          <div class="col">
-            {{ identity.site.label_tag }}
-            {{ identity.site}}
-          </div>
-          <div class="col">
-            {{ identity.floor.label_tag }}
-            {{ identity.floor }}
-          </div>
-        </div>
-      </div>
-
-      <div class="border px-3 pb-3 pt-2 mt-3">
-        <div class=""><p><strong>PREPARED BY:</strong></p></div>
-        <div class="row">
-          <div class="col">
-            {{ identity.member.label_tag }}
-            {{ identity.member }}
-          </div>
-        </div>
-      </div>
-
-      <div class="border px-3 pb-3 pt-2 mt-3">
-        <div class=""><p><strong>RELEASE TO:</strong></p></div>
-        <div class="row">
-          <div class="col">
-            <p></p>
-            {{ identity.client_name.label_tag }}
-            {{ identity.client_name }}
-          </div>
-          <div class="col">
-            <p></p>
-            {{ identity.department_name.label_tag }}
-            {{ identity.department_name }}
-          </div>
-        </div>
-      </div>
-
-    {% endfor %}
-      
-      <div class="row">
-          <table class="table table-bordered table-hover mt-4">
-              <thead>
-                <tr>          
-                    <th scope="col" style="width:70%">Item Name</th>
-                    <th scope="col" style="width:30%">Quantity</th>
-                    <th scope="col"></th>
-                </tr>
-              </thead>
-              <tbody class="form-row spacer">
-                  {% for form in formset %}
-                  <tr> 
-                  
-                    <td>{{ form.item_code}}</td>
-                    <td>{{ form.quantity }}</td>
-                    
-                    <td><center><button type="button" class="btn btn-success add-form-row">+</button></center></td>
-                    
-                  </tr>
-                  
-                  {% endfor %}
-                  
-              </tbody>
-          </table>
-      </div>    
+      {% for identity in formset %}
+        
+        <div class="border px-3 pb-3 pt-2">
           
+          <div class="row mb-4">   
+            <div class=""><p><strong>FROM STORAGE LOCATION:</strong></p></div>    
+            <div class="col">
+              {{ identity.site.label_tag }}
+              {{ identity.site}}
+            </div>
+            <div class="col"> 
+            </div>
+          </div>
 
-      <button type="submit" class="btn btn-dark" id="submitbtnget">
-        <span class="spinner-border spinner-border-sm" id="spinner" role="status" aria-hidden="true"></span> 
-        SUBMIT
-      </button>
+          
+          <div class="row mb-4">
+            <div class=""><p><strong>PREPARED BY:</strong></p></div>
+            <div class="col">
+              {{ identity.member.label_tag }}
+              {{ identity.member }}
+            </div>
+          </div>
+          
+          <div class="row mb-4">
+            <div class=""><p><strong>REMARKS:</strong></p></div>
+            <div class="col">
+              {{ identity.remarks.label_tag }}
+              {{ identity.remarks }}
+            </div>
+          </div>
+        </div>
 
-    </form>
+        <div class="border px-3 pb-3 pt-2 mt-3">
+          <div class=""><p><strong>RELEASE TO:</strong></p></div>
+          <div class="row">
+            <div class="col">
+              <p></p>
+              {{ identity.client_name.label_tag }}
+              {{ identity.client_name }}
+            </div>
+            <div class="col">
+              <p></p>
+              {{ identity.department_name.label_tag }}
+              {{ identity.department_name }}
+            </div>
+          </div>
+        </div>
+
+      {% endfor %}
+        
+        <div class="row">
+            <table class="table table-bordered table-hover mt-4">
+                <thead>
+                  <tr>          
+                      <th scope="col" style="width:70%">Item Name</th>
+                      <th scope="col" style="width:30%">Quantity</th>
+                      <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody class="form-row spacer">
+                    {% for form in formset %}
+                    <tr> 
+                    
+                      <td>{{ form.item_code}}</td>
+                      <td>{{ form.quantity }}</td>
+                      
+                      <td><center><button type="button" class="btn btn-success add-form-row">+</button></center></td>
+                      
+                    </tr>
+                    
+                    {% endfor %}
+                    
+                </tbody>
+            </table>
+        </div>    
+            
+
+        <button type="submit" class="btn btn-dark" id="submitbtnget">
+          <span class="spinner-border spinner-border-sm" id="spinner" role="status" aria-hidden="true"></span> 
+          SUBMIT
+        </button>
+
+      </form>
+    </div>
   </div>
-</div>
 </div>
 <!-- Call the script for the formset -->
 {% include 'inventory/form_script.html' %}
 
-<!-- Call the script for the formset -->
+<!-- Call the script for the loading of floor, item -->
 {% include 'inventory/form_load_select_floor_and_item_code.html' %}
 
 {% endblock %}

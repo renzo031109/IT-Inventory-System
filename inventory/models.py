@@ -62,30 +62,27 @@ class Site(models.Model):
         super(Site, self).save()
 
 
-class Floor(models.Model):
-    floor = models.CharField(max_length=200)
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
+# class Floor(models.Model):
+#     floor = models.CharField(max_length=200)
+#     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
 
-    def __str__(self):
-        return self.floor
+#     def __str__(self):
+#         return self.floor
 
-    class Meta:
-        ordering = ["floor"]
+#     class Meta:
+#         ordering = ["floor"]
     
-    #Save data to upper case
-    def save(self):
-        self.floor = self.floor.upper()
-        super(Floor, self).save()
+#     #Save data to upper case
+#     def save(self):
+#         self.floor = self.floor.upper()
+#         super(Floor, self).save()
 
 
 
 class ItemCode(models.Model):
     code = models.CharField(max_length=200, null=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True) 
-    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True) 
 
-    def __str__(self):
-        return self.code
 
     class Meta:
         ordering = ["code"]
@@ -109,7 +106,6 @@ class ItemBase(models.Model):
     uom = models.ForeignKey(UOM, on_delete=models.CASCADE, null=True)
     critical_value = models.IntegerField(null=True, blank=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True) 
-    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True, blank=True) 
     client_name = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True) 
     department_name = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True) 
 
@@ -150,11 +146,11 @@ class TeamMember(models.Model):
 
 
 class Item(models.Model):
-    item_code = models.ForeignKey(ItemCode, on_delete=models.CASCADE, null=True)
-    quantity = models.IntegerField(null=True) 
-    remarks = models.CharField(max_length=50, null=True)
-    date_added = models.DateTimeField(auto_now_add=True)
-    uom = models.CharField(max_length=20, null=True)
+    item_code = models.ForeignKey(ItemCode, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.IntegerField(null=True, blank=True) 
+    remarks = models.CharField(max_length=50, null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True, blank=True)
+    uom = models.CharField(max_length=20, null=True, blank=True)
     item_name = models.CharField(max_length=200, blank=True, null=True)
     brand_name = models.CharField(max_length=200, blank=True, null=True)
     staff_name = models.CharField(max_length=100, null=True, blank=True)
@@ -169,7 +165,6 @@ class Item(models.Model):
 
     member = models.ForeignKey(TeamMember, on_delete=models.CASCADE, null=True, blank=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True) 
-    floor = models.ForeignKey(Floor, on_delete=models.CASCADE, null=True, blank=True) 
     
     class Meta:
         ordering = ["-date_added"]

@@ -33,47 +33,7 @@ $(document).ready(function () {
    }) 
 
   
-// Validation on get item input requiring valid data
 
-  $('#id_form-0-quantity').on('input', function() {
-
-      if ( !$('#id_form-0-firstName').val() ||
-            !$('#id_form-0-middleName').val() ||
-            !$('#id_form-0-lastName').val() ||
-            !$('#id_form-0-client_name').val() > 0 ) {
-
-         alert('Please input your NAME, CLIENT, and DEPARTMENT before submitting this form.')
-      
-         $('#submitbtnget').prop('disabled', true);
-
-      }
-      else{
-
-         $('#submitbtnget').prop('disabled', false);
-
-      }
-
-   });
-
-   // Validation on get item input requiring valid data
-
-   $('#id_form-0-firstName, #id_form-0-middleName, #id_form-0-lastName, #id_form-0-client_name, #id_form-0-department_name').on('input', function() {
-
-      if ( !$('#id_form-0-firstName').val() ||
-            !$('#id_form-0-middleName').val() ||
-            !$('#id_form-0-lastName').val() ||
-            !$('#id_form-0-client_name').val() > 0 ) {
-      
-         $('#submitbtnget').prop('disabled', true);
-
-      }
-      else{
-
-         $('#submitbtnget').prop('disabled', false);
-
-      }
-
-   });
 
 
 });

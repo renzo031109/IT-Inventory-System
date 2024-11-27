@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Item, ItemBase, ItemCode, UOM, Client, Department, TeamMember, Floor, Site
+from .models import Item, ItemBase, ItemCode, UOM, Client, Department, TeamMember, Site
 from .forms import ItemNewForm, ItemModelFormSet, ItemModelFormSetAdd
 from .filters import ItemFilter, ItemBaseFilter
 from django.http import HttpResponse
@@ -173,7 +173,6 @@ def new_item(request):
         if form.is_valid():
             #get the value of the form
             form_item_site = request.POST.get('site')
-            form_item_floor = request.POST.get('floor')
             form_item_name = request.POST.get('item_name')
             form_item_brand = request.POST.get('brand_name')
             form_item_soh = request.POST.get('soh')
@@ -182,24 +181,21 @@ def new_item(request):
             form_item_department = request.POST.get('department_name')
             # form_item_price = request.POST.get('price')
 
-            #convert UOM id to values of foreign key
+            #convert id to values of foreign key
             uom_value = UOM.objects.get(id=form_item_uom)
-         
-            #using try-except method in case of null value
-            try:
-                record_name = ItemBase.objects.filter(item_name=form_item_name, brand_name=form_item_brand)
+            site_value = Site.objects.get(id=form_item_site)
 
-                for record in record_name:
-                    if record.item_name.upper() == form_item_name.upper() and record.brand_name.upper() == form_item_brand.upper():
-                        messages.error(request, "Item already exist!")
-                        return redirect('new_item')
-                       
-            except:
-                record_name = None
 
-            #assign default value to remarks
-            concat = form_item_name + " | " + form_item_brand
-            itemcode = ItemCode(code=concat)
+            #formulate the itemcode
+            concat = form_item_name + " | " + form_item_brand + " (" + str(uom_value) +") " + " - " + str(site_value)
+
+            #check if the item exist
+            if ItemBase.objects.filter(item_code__iexact=concat).exists():
+                messages.error(request, f"The value '{concat}' already exists in the database. Please enter a different value.")
+                return redirect('new_item')
+            
+            itemcode = ItemCode(code=concat, site=site_value)
+
 
             #Assign form to a variable
             itemNewForm = form.save(commit=False)
@@ -227,8 +223,7 @@ def new_item(request):
                                     member=member,
                                     client_name=form_item_client,
                                     department_name=form_item_department,
-                                    site=form_item_site,
-                                    floor=form_item_floor
+                                    site=site_value,              
                                     )
             
 
@@ -360,7 +355,6 @@ def get_item(request):
     client_name_list = []
     department_name_list = []
     site_name_list = []
-    floor_name_list = []
 
     #list for validation checking
     item_error_list = []
@@ -368,12 +362,13 @@ def get_item(request):
 
     if request.method == 'POST':
         formset = ItemModelFormSet(request.POST)
+        print("firstttttttt")
         if formset.is_valid():
             for form in formset:
 
                 # only save if name is present
                 if form.cleaned_data.get('item_code') and form.cleaned_data.get('quantity'): 
-                                   
+                         
                     #get the item name from the form 
                     get_item_code = form.cleaned_data.get('item_code')
 
@@ -392,7 +387,6 @@ def get_item(request):
                     # formatting of Full Name
                     get_member_name = form.cleaned_data.get('member')
                     get_site_name = form.cleaned_data.get('site')
-                    get_floor_name = form.cleaned_data.get('floor')
                     # get_staff_name = f"{get_firstName} {get_middleName} {get_lastName}"
                     get_client_name = form.cleaned_data.get('client_name')
                     get_department_name = form.cleaned_data.get('department_name')
@@ -403,7 +397,7 @@ def get_item(request):
                     client_name_list.append(get_client_name)
                     department_name_list.append(get_department_name)
                     site_name_list.append(get_site_name)
-                    floor_name_list.append(get_floor_name)
+    
                     
                     #get the first value of the form
                     # staff_name = staff_name_list[0]
@@ -411,8 +405,8 @@ def get_item(request):
                     client_name = client_name_list[0]
                     department_name = department_name_list[0]
                     site_name = site_name_list[0]
-                    floor_name = floor_name_list[0]
 
+                  
                     if item_soh.soh < get_qty:
                         messages.error(request, f"Ooops, Your available stock for '{item_soh.item_name}' is only '{item_soh.soh}")
                         item_error_list.append(item_soh.item_name)
@@ -445,10 +439,11 @@ def get_item(request):
                         itemGetForm.client_name = client_name
                         itemGetForm.department_name = department_name
                         itemGetForm.site = site_name
-                        itemGetForm.floor = floor_name
+    
 
                         # itemGetForm.item_value = total
                         itemGetForm.save()
+                 
                 else:
                     messages.error(request, "Invalid Input. Form is incomplete.")
 
@@ -648,10 +643,10 @@ def export_excel_summary(request):
 
 
 #This is connected to itemcode ajax value
-def get_floors_and_items(request, site_id):
-    floors = list(Floor.objects.filter(site_id=site_id).values('id', 'floor'))
+def get_load_items(request, site_id):
     items = list(ItemCode.objects.filter(site_id=site_id).values('id', 'code'))
-    return JsonResponse({'floors': floors, 'items': items})
+    return JsonResponse({'items': items})
+
 
 
 
