@@ -19,11 +19,30 @@ NEW PURCHASES
 
           <div class="row">
 
+            <div><center><h3>ADD QUANTITY</h3></center></div>
+
+          </div>
+
+          {% for identity in formset %}
+
+          <div class="row">
+
+            <div class="col">
+              {{ identity.site.label_tag }}
+              {{ identity.site}}
+            </div>
+
+          </div>
+
+          {% endfor %}
+
+          <div class="row">
+
               <table class="table table-bordered table-hover mt-3">
                   <thead>
 
                     <tr>
-                      <th colspan="4"><center><h3>NEW PURCHASES</h3></center></th>
+                      
                     </tr> 
                     <tr>  
                         <th scope="col" style="width:80%">Item Name</th>

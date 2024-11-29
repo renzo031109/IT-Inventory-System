@@ -165,13 +165,11 @@ def delete_itembase(request, item_code):
 
 @login_required
 def new_item(request):
-    #initialize user client and department static
-
     if request.method == 'POST':
         form = ItemNewForm(request.POST)
 
         if form.is_valid():
-            #get the value of the form
+            # Get the values from the form
             form_item_site = request.POST.get('site')
             form_item_name = request.POST.get('item_name')
             form_item_brand = request.POST.get('brand_name')
@@ -179,84 +177,67 @@ def new_item(request):
             form_item_uom = request.POST.get('uom')
             form_item_client = request.POST.get('client_name')
             form_item_department = request.POST.get('department_name')
-            # form_item_price = request.POST.get('price')
 
-            #convert id to values of foreign key
+            # Convert id to values of foreign keys
             uom_value = UOM.objects.get(id=form_item_uom)
             site_value = Site.objects.get(id=form_item_site)
 
+            # Formulate the item code
+            concat = f"{form_item_name} | {form_item_brand} | {site_value}"
 
-            #formulate the itemcode
-            concat = form_item_name + " | " + form_item_brand + " (" + str(uom_value) +") " + " - " + str(site_value)
-
-            #check if the item exist
+            # Check if the item code already exists
             if ItemBase.objects.filter(item_code__iexact=concat).exists():
                 messages.error(request, f"The value '{concat}' already exists in the database. Please enter a different value.")
                 return redirect('new_item')
             
-            itemcode = ItemCode(code=concat, site=site_value)
-
-
-            #Assign form to a variable
+            # Create the item code using the create method
+            itemcode = ItemCode.objects.create(code=concat, site=site_value)
+            
+            # Assign form to a variable and save the main form data
             itemNewForm = form.save(commit=False)
 
-            #define user for the staffname
+            # Define user for the staff name
             try:
                 user = request.user
                 member = TeamMember.objects.get(member=user)
-            except:
+            except TeamMember.DoesNotExist:
                 member = TeamMember.objects.get(member="ADMIN")
 
-            # client = Client.objects.get(client=user_client)
-            # department=Department.objects.get(department=user_department)
-            # site=Site.objects.get(site=form_item_site)
-
-            #copy newitem to Item Transaction
+            # Copy new item to Item Transaction
             itemTransaction = Item(
-                                    item_code=itemcode, 
-                                    item_name=form_item_name, 
-                                    brand_name=form_item_brand, 
-                                    quantity=form_item_soh, 
-                                    remarks="BEGINNING",
-                                    uom=uom_value, 
-                                    # price=form_item_price,
-                                    member=member,
-                                    client_name=form_item_client,
-                                    department_name=form_item_department,
-                                    site=site_value,              
-                                    )
+                item_code=itemcode, 
+                item_name=form_item_name, 
+                brand_name=form_item_brand, 
+                quantity=form_item_soh, 
+                remarks="BEGINNING",
+                uom=uom_value, 
+                member=member,
+                client_name=form_item_client,
+                department_name=form_item_department,
+                site=site_value,
+            )
             
-
-            #assign generated code value to itemcode 
+            # Assign the generated code value to item_code
             itemNewForm.item_code = concat
 
-            # #compute total value
-            # total_value = float(form_item_price) * int(form_item_soh)
-
-            # #beginning balance
-            # itemNewForm.total_price = total_value
-            # itemNewForm.total_value = total_value
-
-            # #get item model and assign value to item_value
-            # items = Item.objects.get(item_code=concat)
-            # items.item_value = total_value
-
             try:
-                #save tables if no error found
+                # Save tables if no error found
                 itemNewForm.save()
-                itemcode.save()
                 itemTransaction.save()
+                itemcode.save()
 
                 messages.success(request, "New Item added successfully!")
                 return redirect('summary_item')
-            except:
-                messages.error(request, "Invalid Input")
+            except Exception as e:
+                messages.error(request, f"Invalid Input: {e}")
 
     else:
         form = ItemNewForm()
 
     context = {'form': form}
     return render(request, 'inventory/new_item.html', context)
+
+
 
 
 @login_required
@@ -351,7 +332,6 @@ def get_item(request):
 
     #Initiate a list variable for the input select fields
     member_name_list = []
-    # staff_name_list = []
     client_name_list = []
     department_name_list = []
     site_name_list = []
@@ -362,22 +342,21 @@ def get_item(request):
 
     if request.method == 'POST':
         formset = ItemModelFormSet(request.POST)
-        print("firstttttttt")
-        if formset.is_valid():
+        if formset.is_valid():          
             for form in formset:
-
+    
                 # only save if name is present
                 if form.cleaned_data.get('item_code') and form.cleaned_data.get('quantity'): 
-                         
+
                     #get the item name from the form 
-                    get_item_code = form.cleaned_data.get('item_code')
+                    get_item_code = str(form.cleaned_data.get('item_code'))
+                    item_soh = ItemBase.objects.get(item_code=get_item_code)
 
                     #get the item qty from the form
                     get_qty = form.cleaned_data.get('quantity')
 
-                    #get the item SOH from model table       
+                    # #get the item SOH from model table       
                     item_soh = ItemBase.objects.get(item_code=get_item_code)
-
 
                     # # get the staff name values
                     # get_firstName = form.cleaned_data.get('firstName')
@@ -387,7 +366,6 @@ def get_item(request):
                     # formatting of Full Name
                     get_member_name = form.cleaned_data.get('member')
                     get_site_name = form.cleaned_data.get('site')
-                    # get_staff_name = f"{get_firstName} {get_middleName} {get_lastName}"
                     get_client_name = form.cleaned_data.get('client_name')
                     get_department_name = form.cleaned_data.get('department_name')
 
@@ -468,6 +446,7 @@ def get_item(request):
 
     else:
         formset = ItemModelFormSet(queryset=Item.objects.none())
+
 
     context = {'formset': formset}
     return render(request, 'inventory/get_item.html', context)

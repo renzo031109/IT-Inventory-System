@@ -43,7 +43,7 @@ class ItemNewForm(forms.ModelForm):
 #Formset for Get Item
 class ItemGetForm(forms.ModelForm):
     class Meta:
-        model = Item
+        Item
 
         fields= ['item_code',
                 'quantity',
@@ -53,10 +53,8 @@ class ItemGetForm(forms.ModelForm):
                 'department_name',
                 'member',
                 'site',
-                'remarks'
-                # 'firstName',
-                # 'lastName',
-                # 'middleName'
+                'remarks',
+
         ]
 
         labels={
@@ -68,7 +66,7 @@ class ItemGetForm(forms.ModelForm):
             'dapartment_name': 'DEPARTMENT NAME',
             'site': 'SITE',
             'floor': 'FLOOR',
-            'remarks': 'PURPOSE'
+
         }
 
         widgets={
@@ -83,6 +81,10 @@ class ItemGetForm(forms.ModelForm):
                 'autocomplete': 'off',
                 'required':True
                 }),
+            'remarks': forms.TextInput(attrs={
+                'class':'form-control',
+                'type':'hidden'
+            }),
             'item_name': forms.TextInput(attrs={
                 'class':'form-control',
                 'type':'hidden'
@@ -110,12 +112,7 @@ class ItemGetForm(forms.ModelForm):
                 'class':'form-control', 
                 'required':True
                 }),
-            'remarks': forms.TextInput(attrs={
-                'class':'form-control',
-                'placeholder': '-',
-                'autocomplete': 'off',
-                'required':True
-                }),
+ 
 
         }
 
@@ -139,6 +136,8 @@ ItemModelFormSet = modelformset_factory(Item, form=ItemGetForm, extra=1)
 
 
 #Formset for Add Item
+
+
 ItemModelFormSetAdd = modelformset_factory(
     Item, 
     fields=(
