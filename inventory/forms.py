@@ -43,7 +43,7 @@ class ItemNewForm(forms.ModelForm):
 #Formset for Get Item
 class ItemGetForm(forms.ModelForm):
     class Meta:
-        Item
+        model = Item
 
         fields= ['item_code',
                 'quantity',
@@ -135,69 +135,91 @@ class ItemGetForm(forms.ModelForm):
 ItemModelFormSet = modelformset_factory(Item, form=ItemGetForm, extra=1) 
 
 
+
 #Formset for Add Item
 
+class ItemAddForm(forms.ModelForm):
 
-ItemModelFormSetAdd = modelformset_factory(
-    Item, 
-    fields=(
-        'item_code',
-        'quantity',
-        'item_name',
-        'brand_name',
-        'staff_name',
-        'client_name',
-        'department_name',
-        # 'price'
-        ),
-    extra=1,
-    labels={
-        'staff_name': 'STAFF NAME',
-        'client_name': 'CLIENT NAME',
-        'dapartment_name': 'DEPARTMENT NAME',
-        # 'price': 'PRICE'
-    },
-    widgets={
-        'item_code': forms.Select(attrs={
-            'class':'form-control form-select',
-            'autocomplete': 'off',
-            'required':True
-            }),
-        'quantity': forms.TextInput(attrs={
-            'class':'form-control',
-            'placeholder': '0',
-            'autocomplete': 'off',
-            'id':'id_add_form-0-quantity',
-            'required':True
-            }),
-        'remarks': forms.TextInput(attrs={
-            'class':'form-control',
-            'type':'hidden'
-            }),
-        'item_name': forms.TextInput(attrs={
-            'class':'form-control',
-            'type':'hidden'
-            }),
-        'brand_name': forms.TextInput(attrs={
-            'class':'form-control',
-            'type':'hidden'
-            }),
-        'staff_name': forms.TextInput(attrs={
-            'class':'form-control',
+    class Meta:
+        model = Item
+
+        fields=[
+            'item_code',
+            'quantity',
+            'item_name',
+            'brand_name',
+            'staff_name',
+            'client_name',
+            'department_name',
+            'site'
+        ]
      
-            }),
-        'client_name': forms.Select(attrs={
-            'class':'form-control',
-            }),
-        'department_name': forms.Select(attrs={
-            'class':'form-control',
-       
-            }),
-        # 'price': forms.TextInput(attrs={
-        #     'class':'form-control',
-        #     'required':True
-        #     }),
+        labels={
+            'staff_name': 'STAFF NAME',
+            'client_name': 'CLIENT NAME',
+            'dapartment_name': 'DEPARTMENT NAME',
+            'site': 'SITE'
+        }
 
-    }
-)
+        widgets={
+            'item_code': forms.Select(attrs={
+                'class':'form-control form-select',
+                'autocomplete': 'off',
+                'required':True
+                }),
+            'quantity': forms.TextInput(attrs={
+                'class':'form-control',
+                'placeholder': '0',
+                'autocomplete': 'off',
+                'id':'id_add_form-0-quantity',
+                'required':True
+                }),
+            'remarks': forms.TextInput(attrs={
+                'class':'form-control',
+                'type':'hidden'
+                }),
+            'item_name': forms.TextInput(attrs={
+                'class':'form-control',
+                'type':'hidden'
+                }),
+            'brand_name': forms.TextInput(attrs={
+                'class':'form-control',
+                'type':'hidden'
+                }),
+            'staff_name': forms.TextInput(attrs={
+                'class':'form-control',
+        
+                }),
+            'client_name': forms.Select(attrs={
+                'class':'form-control',
+                }),
+            'department_name': forms.Select(attrs={
+                'class':'form-control',
+        
+                }),
+            'site': forms.Select(attrs={
+                'class':'form-control', 
+                'required':True
+                }),
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['item_code'].queryset = ItemCode.objects.none()
+
+        print("this site", self.data)
+
+        if 'form-0-site' in self.data:
+            try:
+                site_id = int(self.data.get('form-0-site'))
+                self.fields['item_code'].queryset = ItemCode.objects.filter(site_id=site_id).order_by('code')
+            except (ValueError, TypeError):
+                pass # invalid input from the client; ignore and fallback to empty City queryset
+        elif self.instance.pk:
+            self.fields['item_code'].queryset = self.instance.site.itemcode_set.order_by('code')
+
+            
+
+ItemModelFormSetAdd = modelformset_factory(Item, form=ItemAddForm, extra=1) 
 

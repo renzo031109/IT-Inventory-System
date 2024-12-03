@@ -16,6 +16,7 @@ NEW PURCHASES
       <form class="form-horizontal" method="POST" action="">
       {% csrf_token %}
       {{ formset.management_form }}
+      
 
           <div class="row">
 
@@ -25,49 +26,58 @@ NEW PURCHASES
 
           {% for identity in formset %}
 
-          <div class="row">
+          <div class="border px-3 pb-3 pt-2 mb-4">
 
-            <div class="col">
-              {{ identity.site.label_tag }}
-              {{ identity.site}}
+            <div class="row">
+
+              <div class="col">
+                {{ identity.site.label_tag }}
+                {{ identity.site}}
+              </div>
+
+              <div class="col">
+              </div>
+
+              <div class="col">
+              </div>
+
             </div>
-
           </div>
 
           {% endfor %}
 
-          <div class="row">
+          <div class="border px-4 pb-3 pt-2 mb-3">
+            <div class="row">
 
-              <table class="table table-bordered table-hover mt-3">
-                  <thead>
+                <table class="table table-bordered table-hover mt-3">
+                    <thead>
 
-                    <tr>
-                      
-                    </tr> 
-                    <tr>  
-                        <th scope="col" style="width:80%">Item Name</th>
-                        <!-- <th scope="col" style="width:20%">Price</th> -->
-                        <th scope="col" style="width:20%">Quantity</th>
-                        <th scope="col"></th>
-                    </tr>
-                  </thead>
-                  <tbody class="form-row spacer">
-                      {% for form in formset %}
-                      <tr> 
-                      
-                        <td>{{ form.item_code }}</td>
-                        <!-- <td>{{ form.price }}</td> -->
-                        <td>{{ form.quantity }}</td>
+                      <tr>
                         
-                        <td><center><button type="button" class="btn btn-success add-form-row">+</button></center></td>
-                        
+                      </tr> 
+                      <tr>  
+                          <th scope="col" style="width:80%">Item Name</th>
+                          <!-- <th scope="col" style="width:20%">Price</th> -->
+                          <th scope="col" style="width:20%">Quantity</th>
+                          <th scope="col"></th>
                       </tr>
-                      
-                      {% endfor %}
-                      
-                  </tbody>
-              </table>
-              
+                    </thead>
+                    <tbody class="form-row spacer">
+                        {% for form in formset %}
+                        <tr> 
+                        
+                          <td>{{ form.item_code }}</td>
+                          <!-- <td>{{ form.price }}</td> -->
+                          <td>{{ form.quantity }}</td>
+                          
+                          <td><center><button type="button" class="btn btn-success add-form-row">+</button></center></td>
+                          
+                        </tr>
+                        
+                        {% endfor %}                    
+                    </tbody>
+                </table>              
+            </div>
           </div>
 
           <button type="submit" class="btn btn-dark" id="submitbtnadd">
@@ -81,6 +91,10 @@ NEW PURCHASES
 </div>
 <!-- Call the script for the formset -->
 {% include 'inventory/form_script_add.html' %}
+
+
+<!-- Call the script for the loading of floor, item -->
+{% include 'inventory/form_load_select_floor_and_item_code.html' %}
 
 {% endblock %}
 

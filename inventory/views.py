@@ -21,9 +21,9 @@ import json
 
 
 
-# #set universal variable for user settings.
-# user_department = "FINANCE"
-# user_client = "SHORE360"
+#set universal variable for user settings.
+user_department = "IT"
+user_client = "SHORE360"
 
 
 
@@ -485,10 +485,10 @@ def export_excel_inventory(request):
 
     # Add headers
     headers =   [
+                'SITE',
                 'ITEM NAME',	
                 'BRAND NAME',
                 'QUANTITY',	
-                # 'PRICE',
                 'UOM',	
                 'DATE',
                 'REMARKS',	
@@ -518,20 +518,21 @@ def export_excel_inventory(request):
     for item in items:
         
         #convert object fields to string
+        site = str(item.site)
         member = str(item.member)
         client_name = str(item.client_name)
         department_name = str(item.department_name)
         date_added = datetime.strftime(item.date_added,'%m/%d/%Y %H:%M:%S')
 
-        worksheet.append([
+        worksheet.append(
+            [
+            site,
             item.item_name,
             item.brand_name,
             item.quantity,
-            # item.price,
             item.uom,
             date_added,
             item.remarks,
-            # item.staff_name,
             member,
             client_name,
             department_name
@@ -569,6 +570,7 @@ def export_excel_summary(request):
 
     # Add headers
     headers =   [
+                'SITE',
                 'ITEM NAME',	
                 'BRAND NAME',
                 'UOM',	
@@ -602,11 +604,12 @@ def export_excel_summary(request):
     for item in items:
         
         #convert object fields to string
-
+        site = str(item.site)
         uom = str(item.uom)
         date_added = datetime.strftime(item.date_added,'%m/%d/%Y %H:%M:%S')
 
         worksheet.append([
+            site,
             item.item_name,
             item.brand_name,
             uom,

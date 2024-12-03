@@ -1,6 +1,6 @@
 import django_filters
 from django_filters import DateFilter, CharFilter, ChoiceFilter
-from .models import Item, ItemBase, Department, Client
+from .models import Item, ItemBase, Department, Client, Site
 from django import forms
 
 
@@ -27,6 +27,15 @@ for value in clients:
     clients_list.append((value.id, value.client))
 
 
+#client list
+site = Site.objects.all()
+site_list = []
+
+#get client values
+for value in site:
+    site_list.append((value.id, value.site))
+
+
 
 
 class DateInput(forms.DateInput):
@@ -34,6 +43,7 @@ class DateInput(forms.DateInput):
 
 
 class ItemFilter(django_filters.FilterSet):
+    site= ChoiceFilter(field_name='site', label="STORAGE LOCATION", choices=site_list)
     item_name = CharFilter(field_name='item_name', lookup_expr='icontains', label="ITEM NAME")
     brand_name = CharFilter(field_name='brand_name', lookup_expr='icontains', label="BRAND NAME")
     remarks = ChoiceFilter(field_name='remarks', label="REMARKS", choices=remarks_select)
@@ -45,10 +55,11 @@ class ItemFilter(django_filters.FilterSet):
    
     class Meta:
         model = Item
-        fields = ['item_name','brand_name','remarks','staff_name','department','client','date_from','date_to']
+        fields = ['site','item_name','brand_name','remarks','staff_name','department','client','date_from','date_to']
 
 
 class ItemBaseFilter(django_filters.FilterSet):
+    site= ChoiceFilter(field_name='site', label="STORAGE LOCATION", choices=site_list)
     item_name = CharFilter(field_name='item_name', lookup_expr='icontains', label="ITEM NAME")
     brand_name = CharFilter(field_name='brand_name', lookup_expr='icontains', label="BRAND NAME")
     date_from = DateFilter(field_name='date_added', lookup_expr='date__gte', label="DATE FROM", widget=DateInput(attrs={'type': 'date'}))
@@ -56,4 +67,4 @@ class ItemBaseFilter(django_filters.FilterSet):
 
     class Meta:
         model = ItemBase
-        fields = ['item_name','brand_name','date_from','date_to']
+        fields = ['site','item_name','brand_name','date_from','date_to']
