@@ -54,6 +54,7 @@ class Site(models.Model):
 
     class Meta:
         ordering = ["site"]
+        verbose_name = "Storage Location"
     
     #Save data to upper case
     def save(self, *args, **kwargs):
