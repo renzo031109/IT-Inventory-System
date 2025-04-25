@@ -14,6 +14,8 @@ urlpatterns = [
     path('export_file_summary/', views.export_excel_summary, name='export_file_summary'),
 
     #loading of fields condition
-    path('load_items/<int:site_id>/', views.get_load_items, name='ajax_load_item'),
+    # path('load_items/<int:site_id>/', views.get_load_items, name='ajax_load_item'),
+    path('load_items/<int:site_id>/<int:department_id>/', views.get_load_items, name='ajax_load_item'),
+
 
 ]

@@ -7,6 +7,7 @@ class ItemNewForm(forms.ModelForm):
     class Meta:
         model = ItemBase
         fields = [ 
+            'department',
             'site',
             'item_name',
             'brand_name',
@@ -16,6 +17,7 @@ class ItemNewForm(forms.ModelForm):
             'critical_value'
             ]
         labels = {
+            'department': 'DEPARTMENT',
             'site': 'SITE',
             'item_name': 'ITEM NAME',
             'brand_name': 'BRAND NAME (NONE if N/A)',
@@ -27,6 +29,7 @@ class ItemNewForm(forms.ModelForm):
 
         }
         widgets = {
+            'department': forms.Select(attrs={'class':'ItemNewForm', 'autocomplete': 'off', 'required':True}),
             'site': forms.Select(attrs={'class':'ItemNewForm', 'autocomplete': 'off', 'required':True}),
             'item_name': forms.TextInput(attrs={'class':'ItemNewForm','autocomplete': 'off', 'required':True}),
             'brand_name': forms.TextInput(attrs={'class':'ItemNewForm', 'value':'NONE', 'autocomplete': 'off', 'required':True}),
@@ -45,15 +48,16 @@ class ItemGetForm(forms.ModelForm):
     class Meta:
         model = Item
 
-        fields= ['item_code',
+        fields= [
+                'department',    
+                'item_code',
                 'quantity',
                 'item_name',
                 'brand_name',
-                'client_name',
-                'department_name',
                 'member',
                 'site',
                 'remarks',
+                'ticket'
 
         ]
 
@@ -61,15 +65,19 @@ class ItemGetForm(forms.ModelForm):
             # 'firstName':'FIRST NAME',
             # 'middleName': 'MIDDLE NAME',
             # 'lastName': 'LAST NAME',
+            'department': 'DEPARTMENT',
             'member': 'STAFF NAME',
-            'client_name': 'CLIENT NAME',
-            'dapartment_name': 'DEPARTMENT NAME',
             'site': 'SITE',
             'floor': 'FLOOR',
+            'ticket': 'TICKET NUMBER'
 
         }
 
         widgets={
+            'department': forms.Select(attrs={
+                'class':'form-control', 
+                'required':True
+                }),
             'item_code': forms.Select(attrs={
                 'class':'form-control form-select',
                 'autocomplete': 'off',
@@ -99,18 +107,16 @@ class ItemGetForm(forms.ModelForm):
                 }),
             'member': forms.Select(attrs={
                 'class':'form-control',
-                'required':True
                 }),
-            'client_name': forms.Select(attrs={
-                'class':'form-control',
-                'required':True
-                }),
-            'department_name': forms.Select(attrs={
-                'class':'form-control',    
-                }),
+
             'site': forms.Select(attrs={
                 'class':'form-control', 
                 'required':True
+                }),
+
+            'ticket': forms.TextInput(attrs={
+                'class':'form-control',
+                'autocomplete': 'off',
                 }),
  
 
@@ -122,14 +128,15 @@ class ItemGetForm(forms.ModelForm):
 
         print("this site", self.data)
 
-        if 'form-0-site' in self.data:
+        if 'form-0-site' in self.data and 'form-0-department' in self.data:
             try:
                 site_id = int(self.data.get('form-0-site'))
-                self.fields['item_code'].queryset = ItemCode.objects.filter(site_id=site_id).order_by('code')
+                department_id = int(self.data.get('form-0-department'))
+                self.fields['item_code'].queryset = ItemCode.objects.filter(site_id=site_id, department_id=department_id).order_by('code')
             except (ValueError, TypeError):
-                pass # invalid input from the client; ignore and fallback to empty City queryset
+                pass
         elif self.instance.pk:
-            self.fields['item_code'].queryset = self.instance.site.itemcode_set.order_by('code')
+            self.fields['item_code'].queryset = ItemCode.objects.filter(site=self.instance.site, department=self.instance.department).order_by('code')
             
 
 ItemModelFormSet = modelformset_factory(Item, form=ItemGetForm, extra=1) 
@@ -149,19 +156,21 @@ class ItemAddForm(forms.ModelForm):
             'item_name',
             'brand_name',
             'staff_name',
-            'client_name',
-            'department_name',
-            'site'
+            'site',
+            'department'
         ]
      
         labels={
             'staff_name': 'STAFF NAME',
-            'client_name': 'CLIENT NAME',
-            'dapartment_name': 'DEPARTMENT NAME',
-            'site': 'SITE'
+            'site': 'SITE',
+            'department': 'DEPARTMEMT'
         }
 
         widgets={
+            'department': forms.Select(attrs={
+                'class':'form-control', 
+                'required':True
+                }),
             'item_code': forms.Select(attrs={
                 'class':'form-control form-select',
                 'autocomplete': 'off',
@@ -190,13 +199,7 @@ class ItemAddForm(forms.ModelForm):
                 'class':'form-control',
         
                 }),
-            'client_name': forms.Select(attrs={
-                'class':'form-control',
-                }),
-            'department_name': forms.Select(attrs={
-                'class':'form-control',
-        
-                }),
+
             'site': forms.Select(attrs={
                 'class':'form-control', 
                 'required':True
@@ -204,20 +207,23 @@ class ItemAddForm(forms.ModelForm):
 
         }
 
+
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['item_code'].queryset = ItemCode.objects.none()
 
         print("this site", self.data)
 
-        if 'form-0-site' in self.data:
+        if 'form-0-site' in self.data and 'form-0-department' in self.data:
             try:
                 site_id = int(self.data.get('form-0-site'))
-                self.fields['item_code'].queryset = ItemCode.objects.filter(site_id=site_id).order_by('code')
+                department_id = int(self.data.get('form-0-department'))
+                self.fields['item_code'].queryset = ItemCode.objects.filter(site_id=site_id, department_id=department_id).order_by('code')
             except (ValueError, TypeError):
-                pass # invalid input from the client; ignore and fallback to empty City queryset
+                pass
         elif self.instance.pk:
-            self.fields['item_code'].queryset = self.instance.site.itemcode_set.order_by('code')
+            self.fields['item_code'].queryset = ItemCode.objects.filter(site=self.instance.site, department=self.instance.department).order_by('code')
 
             
 

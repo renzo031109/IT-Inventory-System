@@ -1,20 +1,6 @@
 from django.db import models
 
 
-class Client(models.Model):
-    client = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.client
-
-    class Meta:
-        ordering = ["client"]
-    
-    #Save data to upper case
-    def save(self, *args, **kwargs):
-        self.client = self.client.upper()
-        super(Client, self).save()
-
 
 class Department(models.Model):
     department = models.CharField(max_length=200)
@@ -62,26 +48,11 @@ class Site(models.Model):
         super(Site, self).save(*args, **kwargs)
 
 
-# class Floor(models.Model):
-#     floor = models.CharField(max_length=200)
-#     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
-
-#     def __str__(self):
-#         return self.floor
-
-#     class Meta:
-#         ordering = ["floor"]
-    
-#     #Save data to upper case
-#     def save(self):
-#         self.floor = self.floor.upper()
-#         super(Floor, self).save()
-
-
 
 class ItemCode(models.Model):
     code = models.CharField(max_length=200, null=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True) 
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ["code"]
@@ -105,8 +76,9 @@ class ItemBase(models.Model):
     uom = models.ForeignKey(UOM, on_delete=models.CASCADE, null=True, blank=True)
     critical_value = models.IntegerField(null=True, blank=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True) 
-    client_name = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True) 
-    department_name = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True) 
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True) 
+    user = models.CharField(max_length=50, null=True, blank=True)
+    
 
     class Meta:
         ordering = ["item_name"]
@@ -152,10 +124,11 @@ class Item(models.Model):
     item_name = models.CharField(max_length=200, blank=True, null=True)
     brand_name = models.CharField(max_length=200, blank=True, null=True)
     staff_name = models.CharField(max_length=100, null=True, blank=True)
-    client_name = models.ForeignKey(Client, on_delete=models.CASCADE, null=True, blank=True)
-    department_name = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     member = models.ForeignKey(TeamMember, on_delete=models.CASCADE, null=True, blank=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True) 
+    ticket = models.CharField(max_length=50, null=True, blank=True)
+    user = models.CharField(max_length=50, null=True, blank=True)
     # purpose = models.CharField(max_length=200, blank=True, null=True)
     
     class Meta:

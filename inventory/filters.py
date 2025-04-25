@@ -1,6 +1,6 @@
 import django_filters
 from django_filters import DateFilter, CharFilter, ChoiceFilter
-from .models import Item, ItemBase, Department, Client, Site
+from .models import Item, ItemBase, Site, Department
 from django import forms
 
 
@@ -18,13 +18,6 @@ departments_list = []
 for value in departments:
     departments_list.append((value.id, value.department))
 
-#client list
-clients = Client.objects.all()
-clients_list = []
-
-#get client values
-for value in clients:
-    clients_list.append((value.id, value.client))
 
 
 #client list
@@ -43,6 +36,7 @@ class DateInput(forms.DateInput):
 
 
 class ItemFilter(django_filters.FilterSet):
+    department= ChoiceFilter(field_name='department', label="DEPARTMENT", choices=departments_list)
     site= ChoiceFilter(field_name='site', label="STORAGE LOCATION", choices=site_list)
     item_name = CharFilter(field_name='item_name', lookup_expr='icontains', label="ITEM NAME")
     brand_name = CharFilter(field_name='brand_name', lookup_expr='icontains', label="BRAND NAME")
@@ -50,15 +44,15 @@ class ItemFilter(django_filters.FilterSet):
     date_from = DateFilter(field_name='date_added', lookup_expr='date__gte', label="DATE FROM", widget=DateInput(attrs={'type': 'date'}))
     date_to = DateFilter(field_name='date_added', lookup_expr='date__lte', label="DATE TO", widget=DateInput(attrs={'type': 'date'}))
     staff_name = CharFilter(field_name='staff_name', lookup_expr='icontains', label="STAFF NAME")
-    department= ChoiceFilter(field_name='department_name', label="DEPARTMENT", choices=departments_list)
-    client= ChoiceFilter(field_name='client_name', label="CLIENT", choices=clients_list)
+    staff_name = CharFilter(field_name='ticket', lookup_expr='icontains', label="TICKET NO.")
    
     class Meta:
         model = Item
-        fields = ['site','item_name','brand_name','remarks','staff_name','department','client','date_from','date_to']
+        fields = ['department','site','item_name','brand_name','remarks','staff_name','date_from','date_to', 'ticket']
 
 
 class ItemBaseFilter(django_filters.FilterSet):
+    department= ChoiceFilter(field_name='department', label="DEPARTMENT", choices=departments_list)
     site= ChoiceFilter(field_name='site', label="STORAGE LOCATION", choices=site_list)
     item_name = CharFilter(field_name='item_name', lookup_expr='icontains', label="ITEM NAME")
     brand_name = CharFilter(field_name='brand_name', lookup_expr='icontains', label="BRAND NAME")
@@ -67,4 +61,4 @@ class ItemBaseFilter(django_filters.FilterSet):
 
     class Meta:
         model = ItemBase
-        fields = ['site','item_name','brand_name','date_from','date_to']
+        fields = ['department','site','item_name','brand_name','date_from','date_to']

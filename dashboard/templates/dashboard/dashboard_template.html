@@ -52,6 +52,8 @@ HOME
             <table class="table table-bordered table-hover table-striped">
                   <thead class="table-primary">
                     <tr>
+                      <th scope="col">DEPARTMENT</th>
+                      <th scope="col">SITE</th>
                       <th scope="col">ITEM NAME</th>
                       <th scope="col">BRAND NAME</th>
                       <th scope="col">UOM</th>
@@ -71,6 +73,8 @@ HOME
 
                           {% if item.soh <= item.critical_value %}
 
+                            <td>{{ item.department }}</td>
+                            <td>{{ item.site }}</td>
                             <td>{{ item.item_name }}</td>
                             <td>{{ item.brand_name }}</td>
                             <td>{{ item.uom }}</td>
@@ -84,6 +88,8 @@ HOME
 
                           {% if item.soh <= none_value %}
 
+                            <td>{{ item.department }}</td>
+                            <td>{{ item.site }}</td>
                             <td>{{ item.item_name }}</td>
                             <td>{{ item.brand_name }}</td>
                             <td>{{ item.uom }}</td>

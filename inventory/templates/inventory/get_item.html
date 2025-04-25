@@ -22,40 +22,38 @@ RELEASED ITEM FORM
       {% for identity in formset %}
         
         <div class="border px-3 pb-3 pt-2">
-          
+
           <div class="row mb-4">   
-            <div class=""><p><strong>FROM STORAGE LOCATION:</strong></p></div>    
+            <div class="col">
+              {{ identity.department.label_tag }}
+              {{ identity.department}}
+            </div>
+            <div class="col">
+            </div>
+
+            <div class="col">
+            </div>
+          </div>
+          
+          <div class="row mb-2">       
             <div class="col">
               {{ identity.site.label_tag }}
               {{ identity.site}}
             </div>
-            <div class="col"> 
-            </div>
-          </div>
-
-          
-          <div class="row mb-4">
-            <div class=""><p><strong>PREPARED BY:</strong></p></div>
             <div class="col">
-              {{ identity.member.label_tag }}
-              {{ identity.member }}
+            </div>
+
+            <div class="col">
             </div>
           </div>
-
         </div>
 
         <div class="border px-3 pb-3 pt-2 mt-3">
-          <div class=""><p><strong>RELEASE TO:</strong></p></div>
           <div class="row">
             <div class="col">
               <p></p>
-              {{ identity.client_name.label_tag }}
-              {{ identity.client_name }}
-            </div>
-            <div class="col">
-              <p></p>
-              {{ identity.department_name.label_tag }}
-              {{ identity.department_name }}
+              {{ identity.ticket.label_tag }}
+              {{ identity.ticket }}
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Item, ItemBase, ItemCode, UOM, Department, Client, Site
+from .models import Item, ItemBase, ItemCode, UOM, Site, Department, TeamMember
+
 
 class ItemCodeAdmin(admin.ModelAdmin):
     list_display = ('code', 'site')
@@ -10,9 +11,9 @@ admin.site.register(Item)
 admin.site.register(ItemBase)
 admin.site.register(ItemCode, ItemCodeAdmin)
 admin.site.register(UOM)
-admin.site.register(Department)
-admin.site.register(Client)
 admin.site.register(Site)
+admin.site.register(Department)
+admin.site.register(TeamMember)
 
 
 

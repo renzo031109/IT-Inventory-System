@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Item, ItemBase, ItemCode, UOM, Client, Department, TeamMember, Site
+from .models import Item, ItemBase, ItemCode, UOM, TeamMember, Site, Department
 from .forms import ItemNewForm, ItemModelFormSet, ItemModelFormSetAdd
 from .filters import ItemFilter, ItemBaseFilter
 from django.http import HttpResponse
@@ -19,11 +19,6 @@ from openpyxl.styles import *
 from django.http import JsonResponse
 import json
 
-
-
-#set universal variable for user settings.
-user_department = "IT"
-user_client = "SHORE360"
 
 
 
@@ -170,20 +165,20 @@ def new_item(request):
 
         if form.is_valid():
             # Get the values from the form
+            form_item_department = request.POST.get('department')
             form_item_site = request.POST.get('site')
             form_item_name = request.POST.get('item_name')
             form_item_brand = request.POST.get('brand_name')
             form_item_soh = request.POST.get('soh')
             form_item_uom = request.POST.get('uom')
-            form_item_client = request.POST.get('client_name')
-            form_item_department = request.POST.get('department_name')
 
             # Convert id to values of foreign keys
             uom_value = UOM.objects.get(id=form_item_uom)
             site_value = Site.objects.get(id=form_item_site)
+            department_value = Department.objects.get(id=form_item_department)
 
             # Formulate the item code
-            concat = f"{form_item_name} | {form_item_brand} | {site_value}"
+            concat = f"{form_item_name} | {form_item_brand} | {department_value} | {site_value}"
 
             # Check if the item code already exists
             if ItemBase.objects.filter(item_code__iexact=concat).exists():
@@ -191,7 +186,7 @@ def new_item(request):
                 return redirect('new_item')
             
             # Create the item code using the create method
-            itemcode = ItemCode.objects.create(code=concat, site=site_value)
+            itemcode = ItemCode.objects.create(code=concat, site=site_value, department=department_value)
             
             # Assign form to a variable and save the main form data
             itemNewForm = form.save(commit=False)
@@ -212,9 +207,9 @@ def new_item(request):
                 remarks="BEGINNING",
                 uom=uom_value, 
                 member=member,
-                client_name=form_item_client,
-                department_name=form_item_department,
                 site=site_value,
+                department=department_value,
+                user=request.user
             )
             
             # Assign the generated code value to item_code
@@ -262,9 +257,6 @@ def add_item(request):
                         #get the item SOH from model table
                         item_soh = ItemBase.objects.get(item_code=add_item_code)
 
-                        #assign value to client and department of authenticated user
-                        client = Client.objects.get(client=user_client)
-                        department = Department.objects.get(department=user_department)
     
                         #compute add soh
                         soh = int(item_soh.soh) + int(add_item_qty)
@@ -304,8 +296,6 @@ def add_item(request):
                         member = TeamMember.objects.get(member="ADMIN")
                         itemAddForm.member = member
 
-                    itemAddForm.client_name = client
-                    itemAddForm.department_name = department
   
                     itemAddForm.save()          
                 
@@ -331,10 +321,10 @@ def add_item(request):
 def get_item(request):
 
     #Initiate a list variable for the input select fields
-    member_name_list = []
-    client_name_list = []
     department_name_list = []
+    member_name_list = []
     site_name_list = []
+    ticket_name_list = []
 
     #list for validation checking
     item_error_list = []
@@ -363,26 +353,24 @@ def get_item(request):
                     # get_middleName = form.cleaned_data.get('middleName')
                     # get_lastName = form.cleaned_data.get('lastName')
 
-                    # formatting of Full Name
+                    get_department_name = form.cleaned_data.get('department')
                     get_member_name = form.cleaned_data.get('member')
                     get_site_name = form.cleaned_data.get('site')
-                    get_client_name = form.cleaned_data.get('client_name')
-                    get_department_name = form.cleaned_data.get('department_name')
+                    get_ticket = form.cleaned_data.get('ticket')
 
                     # #populate the list from the user input
                     # staff_name_list.append(get_staff_name)
-                    member_name_list.append(get_member_name)
-                    client_name_list.append(get_client_name)
                     department_name_list.append(get_department_name)
+                    member_name_list.append(get_member_name)
                     site_name_list.append(get_site_name)
+                    ticket_name_list.append(get_ticket)
     
                     
                     #get the first value of the form
-                    # staff_name = staff_name_list[0]
-                    member_name = member_name_list[0]
-                    client_name = client_name_list[0]
                     department_name = department_name_list[0]
+                    member_name = member_name_list[0]
                     site_name = site_name_list[0]
+                    ticket_name = ticket_name_list[0]
 
                   
                     if item_soh.soh < get_qty:
@@ -414,9 +402,9 @@ def get_item(request):
                         itemGetForm.quantity = qtyToNegative
                         itemGetForm.uom = item_soh.uom
                         itemGetForm.member = member_name
-                        itemGetForm.client_name = client_name
-                        itemGetForm.department_name = department_name
+                        itemGetForm.department = department_name
                         itemGetForm.site = site_name
+                        itemGetForm.ticket = ticket_name
     
 
                         # itemGetForm.item_value = total
@@ -450,11 +438,6 @@ def get_item(request):
 
     context = {'formset': formset}
     return render(request, 'inventory/get_item.html', context)
-
-
-@login_required
-def submitted(request):
-    return render(request, 'inventory/submitted.html')
 
 
 @login_required
@@ -493,8 +476,6 @@ def export_excel_inventory(request):
                 'DATE',
                 'REMARKS',	
                 'STAFF NAME',
-                'CLIENT NAME',
-                'DEPARTMENT NAME'	
                 ]
     row_num = 2
 
@@ -518,14 +499,14 @@ def export_excel_inventory(request):
     for item in items:
         
         #convert object fields to string
+        department = str(item.department)
         site = str(item.site)
         member = str(item.member)
-        client_name = str(item.client_name)
-        department_name = str(item.department_name)
         date_added = datetime.strftime(item.date_added,'%m/%d/%Y %H:%M:%S')
 
         worksheet.append(
             [
+            department,
             site,
             item.item_name,
             item.brand_name,
@@ -533,9 +514,8 @@ def export_excel_inventory(request):
             item.uom,
             date_added,
             item.remarks,
-            member,
-            client_name,
-            department_name
+            item.user
+
         ])
     
     workbook.save(response)
@@ -570,6 +550,7 @@ def export_excel_summary(request):
 
     # Add headers
     headers =   [
+                'DEPARTMENT',
                 'SITE',
                 'ITEM NAME',	
                 'BRAND NAME',
@@ -604,19 +585,18 @@ def export_excel_summary(request):
     for item in items:
         
         #convert object fields to string
+        department = str(item.department)
         site = str(item.site)
         uom = str(item.uom)
         date_added = datetime.strftime(item.date_added,'%m/%d/%Y %H:%M:%S')
 
         worksheet.append([
+            department,
             site,
             item.item_name,
             item.brand_name,
             uom,
             item.soh,
-            # item.price,
-            # item.total_price,
-            # item.total_value,
             date_added,
         ])
     
@@ -624,11 +604,28 @@ def export_excel_summary(request):
     return response
 
 
-#This is connected to itemcode ajax value
-def get_load_items(request, site_id):
-    items = list(ItemCode.objects.filter(site_id=site_id).values('id', 'code'))
-    return JsonResponse({'items': items})
 
+
+@login_required
+def submitted(request):
+    return render(request, 'inventory/submitted.html')
+
+
+
+# #This is connected to itemcode ajax value
+# def get_load_items(request, site_id):
+#     items = list(ItemCode.objects.filter(site_id=site_id).values('id', 'code'))
+#     return JsonResponse({'items': items})
+
+def get_load_items(request, site_id, department_id):
+    print(f"Filtering items for Site ID: {site_id}, Department ID: {department_id}")
+
+    items = ItemCode.objects.filter(site_id=site_id, department_id=department_id).values('id', 'code')
+
+    if not items:
+        print("No items found!")  # Debugging output
+
+    return JsonResponse({'items': list(items)})
 
 
 
