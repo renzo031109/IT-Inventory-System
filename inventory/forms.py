@@ -117,6 +117,7 @@ class ItemGetForm(forms.ModelForm):
             'ticket': forms.TextInput(attrs={
                 'class':'form-control',
                 'autocomplete': 'off',
+                'required':True
                 }),
  
 

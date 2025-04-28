@@ -13,23 +13,27 @@ DETAILED RELEASED REPORT
 
 
 <!-- filter option -->
+<div class="row">
+  <div class="col">
+    <button class="btn btn-primary mt-3" id="filterBtn"><i class="fa-solid fa-filter"></i> FILTER</button>
+    <a href="{% url 'export_file_inventory' %}"><button class="btn btn-primary mt-3 ms-2"><i class="fa-solid fa-file-export"></i> EXPORT XLS</button></a>
 
-<button class="btn btn-primary mt-3" id="filterBtn"><i class="fa-solid fa-filter"></i> FILTER</button>
-<a href="{% url 'export_file_inventory' %}"><button class="btn btn-primary mt-3 ms-2"><i class="fa-solid fa-file-export"></i> EXPORT XLS</button></a>
+    <div class="card card-body mt-3" id="filter-slide">
+          <h5>FILTER BY:</h5>
+          <form action="" method="get" class="form-control-sm">
 
-<div class="card card-body mt-3" id="filter-slide">
-      <h5>FILTER BY:</h5>
-      <form action="" method="get" class="form-control-sm">
+              {{ itemFilter.form | crispy }}
 
-          {{ itemFilter.form | crispy }}
+              <button class="btn btn-primary" type="submit">SEARCH</button>
 
-          <button class="btn btn-primary" type="submit">SEARCH</button>
-
-      </form>
+          </form>
+    </div>
+  </div>
+  <div class="col"></div>
 </div>
 
 
-
+<div class="row">
 <div class="card card-body mt-3 mb-5 shadow fade show" style="width: 100%;">
 <table class="table table-bordered table-hover table-striped">
   <center><h3 class="ititles">DETAILED REPORT</h3></center>
@@ -94,7 +98,8 @@ DETAILED RELEASED REPORT
       
     </tbody>
   </table>
-</div>
+  </div>
+  </div>
 </div>
 
 

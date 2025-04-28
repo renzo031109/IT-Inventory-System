@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from inventory.models import Item, ItemBase
+from inventory.models import Item, ItemBase, Department
 from django.http import HttpResponse
 import datetime
 from django.db.models import Q
@@ -55,12 +55,26 @@ def dashboard_view(request):
     for transaction_date in item:
         if transaction_date.date_added.date() == datetime.datetime.now().date():
             transaction_count += 1
-            
+
+   
+    # Get department IDs for DS and NOC
+    
+    
+
+    # Ensure departments exist before filtering
+    ds_department = Department.objects.filter(department="DS").first()
+    ds_department_filter = ItemBase.objects.filter(department__in=[ds_department.id])
+    
+    noc_department = Department.objects.filter(department="NOC").first()
+    noc_department_filter = ItemBase.objects.filter(department__in=[noc_department.id]) 
     
     context = {
         'item_count': item_count,
         'critical_count': critical_count,
         'none_value': none_value,
+        'ds_department_filter': ds_department_filter,
+        'noc_department_filter': noc_department_filter,
+
         'itembase': itembase,
         'transaction_count': transaction_count
 
@@ -96,6 +110,8 @@ def critical_stock_excel_export(request):
 
     # Add headers
     headers =   [
+                'DEPARTMENT',
+                'SITE',
                 'ITEM NAME',	
                 'BRAND NAME',
                 'UOM',	
@@ -119,6 +135,10 @@ def critical_stock_excel_export(request):
 
 
     for item in items:
+
+        uom = str(item.uom)
+        department= str(item.department)
+        site = str(item.site)
         
         if item.critical_value != 0:
         
@@ -126,9 +146,11 @@ def critical_stock_excel_export(request):
             if item.critical_value > 0:
                 if item.soh <= item.critical_value:
                     #convert object fields to string
-                    uom = str(item.uom)
+                    
 
                     worksheet.append([
+                    department,
+                    site,    
                     item.item_name,
                     item.brand_name,
                     uom,
@@ -142,8 +164,9 @@ def critical_stock_excel_export(request):
                 if item.soh <= none_value :
 
                     #convert object fields to string
-                    uom = str(item.uom)
                     worksheet.append([
+                    department,
+                    site, 
                     item.item_name,
                     item.brand_name,
                     uom,

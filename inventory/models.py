@@ -52,7 +52,7 @@ class Site(models.Model):
 class ItemCode(models.Model):
     code = models.CharField(max_length=200, null=True)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True) 
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ["code"]

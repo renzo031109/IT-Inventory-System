@@ -13,20 +13,24 @@ INVENTORY REPORT
 
 
 <!-- filter option -->
+<div class="row">
+  <div class="col">
+      <button class="btn btn-primary mt-3" id="filterBtn"><i class="fa-solid fa-filter"></i> FILTER</button>
+      <a href="{% url 'export_file_summary' %}"><button class="btn btn-primary mt-3 ms-2"><i class="fa-solid fa-file-export"></i> EXPORT XLS</button></a>
 
-<button class="btn btn-primary mt-3" id="filterBtn"><i class="fa-solid fa-filter"></i> FILTER</button>
-<a href="{% url 'export_file_summary' %}"><button class="btn btn-primary mt-3 ms-2"><i class="fa-solid fa-file-export"></i> EXPORT XLS</button></a>
+      <div class="card card-body mt-3" id="filter-slide">
+            <h5>FILTER BY:</h5>
+            <form action="" method="get" class="form-control-sm">
 
-<div class="card card-body mt-3" id="filter-slide">
-      <h5>FILTER BY:</h5>
-      <form action="" method="get" class="form-control-sm">
+                {{ itemFilter.form | crispy }}
 
-          {{ itemFilter.form | crispy }}
+                <button class="btn btn-primary" type="submit">SEARCH</button>
 
-          <button class="btn btn-primary" type="submit">SEARCH</button>
+            </form>
 
-      </form>
-
+      </div>
+  </div>
+  <div class="col"></div>
 </div>
 
 
