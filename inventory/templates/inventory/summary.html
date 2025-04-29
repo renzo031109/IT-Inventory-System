@@ -63,9 +63,12 @@ INVENTORY REPORT
         <td>{{ item.date_added }}</td>
         <td>{{ item.critical_value }}</td>
         <td>
+
+          {% if request.user.groups.all.0.name == "Administrator" %}
           <center>
               <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete{{ item.id }}"><i class="fa-solid fa-trash"></i></button>
           </center>
+          {% endif %}
 
           {% include 'inventory/modal_delete.html' %}
 

@@ -74,6 +74,9 @@ DETAILED RELEASED REPORT
 
 
         {% if item.remarks != 'BEGINNING' %}
+
+        <!-- check if user is admin -->
+        {% if request.user.groups.all.0.name == "Administrator" %}
         <td>          
           <center>
               <button type="submit" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#info_item_report{{ item.id }}"><i class="fa-solid fa-file-invoice"></i></button>
@@ -83,6 +86,9 @@ DETAILED RELEASED REPORT
           <center>
               <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete_item_report{{ item.id }}"><i class="fa-solid fa-trash"></i></button>
           </center>
+
+        {% endif %}
+
           {% include 'inventory/modal_delete.html' %}
           {% include 'inventory/modal_info.html' %}
         {% else %}

@@ -33,10 +33,14 @@
               <li><a class="dropdown-item" href="{% url 'inventory_item' %}">DETAILED REPORT</a></li>
             </ul>
           </li>
+
+          {% if request.user.groups.all.0.name == "Administrator" %}
           
           <li class="nav-item">
             <a class="nav-link" href="/admin" ><i class="fa-solid fa-gear"></i> SETTING</a>
           </li>
+
+          {% endif %}
 
         </ul>
 
@@ -46,7 +50,7 @@
         <ul class="navbar-nav ml-auto">
        
         {% if user.is_authenticated %}
-        <h5 id="hi-name"><i class="fa-solid fa-circle-user"></i> Hi {{ user.username }}!</h5>
+        <h5 id="hi-name"><i class="fa-solid fa-circle-user"></i> Hi, Boss {{ user.username }} !</h5>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'user-logout' %}" ><i class="fa-solid fa-right-from-bracket"></i> Logout</a> 
           </li>
